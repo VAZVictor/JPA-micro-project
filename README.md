@@ -1,4 +1,7 @@
 # JPA-micro-project
 
-Contributors: Victor Ehrenmüller-Jensen
-Mitglied: Elena Mayer
+1. Contributors: Victor Ehrenmüller-Jensen
+
+2. Mitglied: Elena Mayer
+
+3. Mitglied: Annika Neuhauser
