@@ -1,4 +1,7 @@
-package at.htl.workloads.track;
+package at.htl.workloads.audioItem;
 
-public class Track {
+import jakarta.persistence.Entity;
+
+@Entity
+public class Track extends AudioItem {
 }

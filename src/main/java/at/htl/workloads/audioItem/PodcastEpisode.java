@@ -1,4 +1,11 @@
-package at.htl.workloads.podcastEpisode;
+package at.htl.workloads.audioItem;
 
-public class PodcastEpisode {
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+
+@Entity
+
+@Inheritance(strategy = InheritanceType.JOINED)
+public class PodcastEpisode extends AudioItem {
 }
