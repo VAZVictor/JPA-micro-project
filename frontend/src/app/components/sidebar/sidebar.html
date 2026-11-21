@@ -1,0 +1,28 @@
+<aside class="sidebar">
+  <button class="brand" type="button" aria-label="SoundVault – Übersicht" (click)="viewChange.emit('overview')">
+    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="brand-name">soundvault<span>YOUR MUSIC SPACE</span></span>
+  </button>
+
+  <p class="nav-heading">MENÜ</p>
+  <nav class="navigation" aria-label="Hauptnavigation">
+    <button class="nav-link" type="button" [class.active]="activeView() === 'overview'" [attr.aria-current]="activeView() === 'overview' ? 'page' : null" (click)="viewChange.emit('overview')">
+      <span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span>
+    </button>
+    <button class="nav-link" type="button" [class.active]="activeView() === 'tracks'" [attr.aria-current]="activeView() === 'tracks' ? 'page' : null" (click)="viewChange.emit('tracks')">
+      <span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Tracks</span>
+    </button>
+    <button class="nav-link" type="button" [class.active]="activeView() === 'playlists'" [attr.aria-current]="activeView() === 'playlists' ? 'page' : null" (click)="viewChange.emit('playlists')">
+      <span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Playlists</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="demo-note"><span class="status-dot"></span>Lokale Beispieldaten</div>
+    <div class="profile">
+      <span class="avatar" aria-hidden="true">AM</span>
+      <span class="profile-copy">Alex Morgan<small>Musikliebhaber</small></span>
+      <span class="profile-more" aria-hidden="true">···</span>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,57 @@
+:host { display: block; }
+.welcome-card { position: relative; display: flex; min-height: 220px; align-items: center; overflow: hidden; padding: 30px 38px; border-radius: 14px; background: #204e3c; color: #fff; }
+.welcome-copy { position: relative; z-index: 1; max-width: 390px; }
+.welcome-kicker { color: #b5d7c5; font-size: 8px; font-weight: 750; letter-spacing: 1.7px; }
+.welcome-card h2 { margin: 12px 0 9px; font-size: 26px; font-weight: 630; line-height: 1.2; letter-spacing: -.7px; }
+.welcome-card p { margin: 0; color: #d0e0d6; font-size: 11px; }
+.primary-button { margin-top: 21px; padding: 10px 13px; border: 0; border-radius: 7px; background: #f7faf7; color: #23563f; font: inherit; font-size: 10px; font-weight: 700; cursor: pointer; }
+.primary-button span { padding-left: 9px; font-size: 14px; }
+.primary-button:hover { background: #e2efe7; }
+.sound-art { position: absolute; top: 50%; right: 11%; width: 220px; height: 220px; transform: translateY(-50%); }
+.sound-disc { position: absolute; display: grid; place-items: center; border-radius: 50%; }
+.disc-back { top: 28px; left: 31px; width: 168px; height: 168px; background: #35765a; box-shadow: 0 0 0 14px rgb(255 255 255 / 3.5%), 0 0 0 31px rgb(255 255 255 / 2.5%); }
+.disc-front { top: 54px; left: 57px; width: 116px; height: 116px; border: 1px solid rgb(255 255 255 / 32%); background: radial-gradient(circle at center, #f0c989 0 4px, #d6a967 5px 6px, #286147 7px 100%); color: #f2d6a8; font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+.disc-front span { margin-top: 80px; }
+.sound-wave { position: absolute; width: 3px; border-radius: 5px; background: #c0dec9; opacity: .85; }
+.wave-one { top: 37px; right: 4px; height: 28px; }
+.wave-two { top: 48px; right: -7px; height: 15px; }
+.sound-spark { position: absolute; color: #e6c68d; }
+.spark-one { top: 19px; left: 15px; font-size: 15px; }
+.spark-two { right: 19px; bottom: 28px; font-size: 28px; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 16px 0; }
+.stat-card { position: relative; display: flex; min-height: 88px; align-items: center; gap: 12px; padding: 15px 16px; border: 1px solid #ecefec; border-radius: 10px; background: #fff; }
+.stat-icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 9px; font-size: 17px; }
+.icon-green { background: #e9f3ec; color: #3d8b61; }
+.icon-violet { background: #f0edfa; color: #8170bd; }
+.icon-rose { background: #fbefef; color: #c2757b; }
+.stat-label { display: block; margin-bottom: 3px; color: #89938c; font-size: 9px; }
+.stat-card strong { font-size: 17px; font-weight: 700; }
+.stat-caption { margin-left: auto; color: #a0a8a2; font-size: 9px; }
+.overview-grid { display: grid; grid-template-columns: 1.25fr .85fr; gap: 14px; margin-top: 15px; }
+.content-card { min-width: 0; padding: 20px 20px 11px; border: 1px solid #e9ede9; border-radius: 11px; background: #fff; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.eyebrow { margin: 0 0 8px; color: #8d9890; font-size: 9px; font-weight: 750; letter-spacing: 1.45px; }
+.section-heading .eyebrow { margin-bottom: 5px; font-size: 8px; }
+.section-heading h2 { margin: 0; color: #26342a; font-size: 15px; font-weight: 680; letter-spacing: -.3px; }
+.text-button { border: 0; background: none; color: #347456; font: inherit; font-size: 9px; font-weight: 650; cursor: pointer; }
+.text-button span { padding-left: 4px; font-size: 12px; }
+
+@media (max-width: 1050px) {
+  .overview-grid { grid-template-columns: 1fr; }
+  .sound-art { right: 5%; }
+}
+
+@media (max-width: 720px) {
+  .welcome-card { min-height: 205px; padding: 25px 23px; }
+  .welcome-copy { max-width: 280px; }
+  .welcome-card h2 { font-size: 23px; }
+  .welcome-card p { max-width: 235px; line-height: 1.5; }
+  .sound-art { right: -82px; opacity: .48; }
+  .stats-grid { gap: 7px; }
+  .stat-card { min-height: 81px; align-items: flex-start; flex-direction: column; gap: 4px; padding: 10px; }
+  .stat-icon { width: 26px; height: 26px; font-size: 14px; }
+  .stat-label { display: inline; margin-right: 6px; }
+  .stat-card strong { font-size: 14px; }
+  .stat-caption { display: none; }
+  .content-card { padding: 16px 13px 9px; }
+}

@@ -1,0 +1,16 @@
+<div class="track-list">
+  @for (track of tracks(); track track.id) {
+    <article class="track-row">
+      <span class="track-art" [class]="'track-art ' + track.color" aria-hidden="true"><span>{{ track.symbol }}</span></span>
+      <span class="track-main"><strong>{{ track.title }}</strong><small>{{ track.artist }} · {{ track.album }}</small></span>
+      <span class="track-duration">{{ track.duration }}</span>
+      @if (track.favorite) {
+        <span class="favorite-mark" role="img" aria-label="Favorit">♥</span>
+      } @else {
+        <span class="favorite-placeholder" aria-hidden="true"></span>
+      }
+    </article>
+  } @empty {
+    <p class="empty-state">Keine Tracks zu deiner Suche gefunden.</p>
+  }
+</div>
