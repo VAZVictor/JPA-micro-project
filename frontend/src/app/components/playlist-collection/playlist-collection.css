@@ -1,0 +1,30 @@
+:host { display: block; min-width: 0; }
+.playlist-list { display: grid; }
+.playlist-row { display: flex; min-width: 0; align-items: center; gap: 11px; padding: 9px 0; border-top: 1px solid #f0f2f0; }
+.playlist-art { display: grid; width: 37px; height: 37px; flex: none; place-items: center; border-radius: 8px; font-size: 19px; }
+.playlist-green { background: linear-gradient(145deg, #d7e8dc, #a8c9b2); color: #4c7b5b; }
+.playlist-blue { background: linear-gradient(145deg, #d9e4f0, #9eb8d2); color: #55748c; }
+.playlist-orange { background: linear-gradient(145deg, #f1dfcc, #d7ad83); color: #936d47; }
+.playlist-main { min-width: 0; flex: 1; }
+.playlist-main strong { display: block; overflow: hidden; color: #374239; font-size: 10px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.playlist-main small { display: block; overflow: hidden; margin-top: 4px; color: #969f98; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.playlist-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+.playlist-card { overflow: hidden; border: 1px solid #e8ece8; border-radius: 11px; background: #fff; }
+.playlist-cover { position: relative; display: grid; height: 150px; place-items: center; font-size: 54px; }
+.playlist-cover .cover-initials { position: absolute; bottom: 11px; left: 13px; color: rgb(42 55 45 / 48%); font-size: 8px; font-weight: 750; letter-spacing: 1.3px; }
+.playlist-card-copy { padding: 15px; }
+.eyebrow { margin: 0 0 8px; color: #8d9890; font-size: 9px; font-weight: 750; letter-spacing: 1.45px; }
+.playlist-card-copy .eyebrow { font-size: 8px; }
+.playlist-card-copy h2 { margin: 0; color: #28362c; font-size: 14px; font-weight: 680; }
+.playlist-card-copy > p:last-child { margin: 6px 0 0; color: #8a948d; font-size: 10px; line-height: 1.5; }
+.empty-state { padding: 24px 5px; color: #8b958e; font-size: 11px; text-align: center; }
+
+@media (max-width: 720px) {
+  .playlist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .playlist-cover { height: 120px; }
+}
+
+@media (max-width: 420px) {
+  .playlist-grid { grid-template-columns: 1fr; }
+  .playlist-cover { height: 145px; }
+}

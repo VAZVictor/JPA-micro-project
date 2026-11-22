@@ -1,0 +1,30 @@
+@if (compact()) {
+  <div class="playlist-list">
+    @for (playlist of playlists(); track playlist.id) {
+      <article class="playlist-row">
+        <span class="playlist-art" [class]="'playlist-art ' + playlist.color" aria-hidden="true"><span>{{ playlist.symbol }}</span></span>
+        <span class="playlist-main"><strong>{{ playlist.name }}</strong><small>{{ playlist.trackCount }} Tracks</small></span>
+      </article>
+    } @empty {
+      <p class="empty-state">Keine Playlists zu deiner Suche gefunden.</p>
+    }
+  </div>
+} @else {
+  <div class="playlist-grid">
+    @for (playlist of playlists(); track playlist.id) {
+      <article class="playlist-card">
+        <div class="playlist-cover" [class]="'playlist-cover ' + playlist.color" aria-hidden="true">
+          <span>{{ playlist.symbol }}</span>
+          <span class="cover-initials">SV · 0{{ playlist.id }}</span>
+        </div>
+        <div class="playlist-card-copy">
+          <p class="eyebrow">{{ playlist.trackCount }} TRACKS</p>
+          <h2>{{ playlist.name }}</h2>
+          <p>{{ playlist.description }}</p>
+        </div>
+      </article>
+    } @empty {
+      <p class="empty-state">Keine Playlists zu deiner Suche gefunden.</p>
+    }
+  </div>
+}

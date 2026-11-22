@@ -1,0 +1,50 @@
+<section class="welcome-card">
+  <div class="welcome-copy">
+    <span class="welcome-kicker">DEIN PERSÖNLICHER MUSIKRAUM</span>
+    <h2>Finde den Sound<br />für deinen Moment.</h2>
+    <p>Stöbere durch deine Tracks und entdecke, was du gesammelt hast.</p>
+    <button class="primary-button" type="button" (click)="navigate.emit('tracks')">Bibliothek öffnen <span aria-hidden="true">→</span></button>
+  </div>
+  <div class="sound-art" aria-hidden="true">
+    <span class="sound-disc disc-back"></span>
+    <span class="sound-disc disc-front"><span>SV</span></span>
+    <span class="sound-wave wave-one"></span><span class="sound-wave wave-two"></span>
+    <span class="sound-spark spark-one">✳</span><span class="sound-spark spark-two">·</span>
+  </div>
+</section>
+
+<section class="stats-grid" aria-label="Sammlungsübersicht">
+  <article class="stat-card">
+    <span class="stat-icon icon-green" aria-hidden="true">♫</span>
+    <div><span class="stat-label">Tracks</span><strong>{{ totalTrackCount() }}</strong></div>
+    <span class="stat-caption">in deiner Bibliothek</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon icon-violet" aria-hidden="true">▤</span>
+    <div><span class="stat-label">Playlists</span><strong>{{ totalPlaylistCount() }}</strong></div>
+    <span class="stat-caption">für jede Stimmung</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon icon-rose" aria-hidden="true">♥</span>
+    <div><span class="stat-label">Favoriten</span><strong>{{ favoriteCount() }}</strong></div>
+    <span class="stat-caption">deine Lieblingstracks</span>
+  </article>
+</section>
+
+<div class="overview-grid">
+  <section class="content-card">
+    <div class="section-heading">
+      <div><p class="eyebrow">FRISCH IN DEINER SAMMLUNG</p><h2>Zuletzt hinzugefügt</h2></div>
+      <button class="text-button" type="button" (click)="navigate.emit('tracks')">Alle Tracks <span aria-hidden="true">→</span></button>
+    </div>
+    <app-track-list [tracks]="tracks().slice(0, 4)" />
+  </section>
+
+  <section class="content-card">
+    <div class="section-heading">
+      <div><p class="eyebrow">DEINE AUSWAHL</p><h2>Playlists</h2></div>
+      <button class="text-button" type="button" (click)="navigate.emit('playlists')">Alle ansehen <span aria-hidden="true">→</span></button>
+    </div>
+    <app-playlist-collection [playlists]="playlists().slice(0, 3)" [compact]="true" />
+  </section>
+</div>

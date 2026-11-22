@@ -1,0 +1,12 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">DEINE SOUNDVAULT</p>
+    <h1>{{ title() }}</h1>
+    <p class="page-description">{{ description() }}</p>
+  </div>
+  <label class="search-box">
+    <span class="search-icon" aria-hidden="true">⌕</span>
+    <span class="visually-hidden">Sammlung durchsuchen</span>
+    <input type="search" placeholder="In deiner Sammlung suchen" [value]="searchTerm()" (input)="updateSearch($event)" />
+  </label>
+</section>

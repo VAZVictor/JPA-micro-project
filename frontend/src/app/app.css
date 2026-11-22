@@ -1,0 +1,34 @@
+:host { display: block; min-height: 100vh; color: #202822; }
+.app-shell { display: flex; min-height: 100vh; }
+.workspace { min-width: 0; flex: 1; background: #f7f8f6; }
+.topbar { display: flex; height: 65px; align-items: center; justify-content: space-between; padding: 0 42px; border-bottom: 1px solid #ebeeeb; background: rgb(255 255 255 / 72%); }
+.breadcrumb { color: #7c867e; font-size: 11px; }
+.breadcrumb > span { padding: 0 8px; color: #c0c7c1; }
+.topbar-right { display: flex; align-items: center; gap: 17px; }
+.demo-badge { display: flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid #e1e8e2; border-radius: 20px; color: #718078; font-size: 8px; font-weight: 750; letter-spacing: 1px; }
+.status-dot { display: inline-block; width: 6px; height: 6px; flex: none; border-radius: 50%; background: #4eaa78; }
+.top-avatar { display: grid; width: 29px; height: 29px; place-items: center; border-radius: 50%; background: #f1e8dc; color: #765d43; font-size: 9px; font-weight: 750; }
+.page-content { width: min(1160px, 100%); margin: 0 auto; padding: 38px 42px 22px; }
+.library-card { min-width: 0; padding: 20px 20px 13px; border: 1px solid #e9ede9; border-radius: 11px; background: #fff; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.eyebrow { margin: 0 0 5px; color: #8d9890; font-size: 8px; font-weight: 750; letter-spacing: 1.45px; }
+.section-heading h2 { margin: 0; color: #26342a; font-size: 15px; font-weight: 680; letter-spacing: -.3px; }
+.sort-label { color: #9aa39c; font-size: 8px; font-weight: 700; letter-spacing: 1px; }
+.page-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 25px; padding: 13px 1px 0; border-top: 1px solid #e9ede9; color: #9aa39c; font-size: 9px; }
+.footer-dot { padding: 0 4px; color: #4e9970; }
+
+@media (max-width: 1050px) {
+  .page-content { padding-right: 28px; padding-left: 28px; }
+  .topbar { padding-right: 28px; padding-left: 28px; }
+}
+
+@media (max-width: 720px) {
+  .topbar { height: 56px; padding: 0 17px; }
+  .page-content { padding: 28px 17px 18px; }
+  .page-footer { font-size: 8px; }
+}
+
+@media (max-width: 420px) {
+  .topbar-right { gap: 9px; }
+  .page-footer { flex-direction: column; }
+}
