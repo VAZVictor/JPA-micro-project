@@ -1,9 +1,10 @@
 package at.htl.workloads.artist;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import at.htl.workloads.audioItem.Track;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Artist {
@@ -19,4 +20,7 @@ public class Artist {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY)
+    private List<Track> tracks = new ArrayList<>();
 }
