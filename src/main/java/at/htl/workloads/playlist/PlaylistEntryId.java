@@ -1,20 +1,26 @@
 package at.htl.workloads.playlist;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.util.Objects;
 
-// TODO (you): add the annotation required by your chosen composite-key mapping
+@Embeddable
 public class PlaylistEntryId implements Serializable {
 
+    @Column(name = "playlist_id")
     private Long playlistId;
-    private Integer position;
+
+    @Column(name = "audio_item_id")
+    private Long audioItemId;
 
     public PlaylistEntryId() {
     }
 
-    public PlaylistEntryId(Long playlistId, Integer position) {
+    public PlaylistEntryId(Long playlistId, Long audioItemId) {
         this.playlistId = playlistId;
-        this.position = position;
+        this.audioItemId = audioItemId;
     }
 
     public Long getPlaylistId() {
@@ -25,25 +31,24 @@ public class PlaylistEntryId implements Serializable {
         this.playlistId = playlistId;
     }
 
-    public Integer getPosition() {
-        return position;
+    public Long getAudioItemId() {
+        return audioItemId;
     }
 
-    public void setPosition(Integer position) {
-        this.position = position;
+    public void setAudioItemId(Long audioItemId) {
+        this.audioItemId = audioItemId;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PlaylistEntryId that)) {
-            return false;
-        }
-        return Objects.equals(playlistId, that.playlistId)
-                && Objects.equals(position, that.position);
+        if (this == o) return true;
+        if (!(o instanceof PlaylistEntryId other)) return false;
+        return Objects.equals(playlistId, other.playlistId)
+                && Objects.equals(audioItemId, other.audioItemId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playlistId, position);
+        return Objects.hash(playlistId, audioItemId);
     }
 }

@@ -1,14 +1,10 @@
 package at.htl.workloads.audioItem;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AudioItem {
-
-    // TODO (you): configure the chosen inheritance strategy on this root entity
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +16,17 @@ public abstract class AudioItem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AudioItem other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return AudioItem.class.hashCode();
     }
 }
