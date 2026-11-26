@@ -11,6 +11,7 @@ import at.htl.workloads.listeningSession.ListeningSession;
 import at.htl.workloads.playlist.Playlist;
 import at.htl.workloads.playlist.PlaylistEntry;
 import at.htl.workloads.user.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -71,6 +72,14 @@ class EntityMappingTest {
     }
 
     @Test
+    void inheritanceStrategyIsNotDeclaredOnSubclasses() {
+        assertFalse(Track.class.isAnnotationPresent(Inheritance.class),
+                "The inheritance strategy belongs only to the hierarchy root");
+        assertFalse(PodcastEpisode.class.isAnnotationPresent(Inheritance.class),
+                "The inheritance strategy belongs only to the hierarchy root");
+    }
+
+    @Test
     void playlistEntryHasACompositeKeyOfPlaylistIdAndPosition()
             throws NoSuchFieldException, NoSuchMethodException {
         var embeddedIdField = Arrays.stream(PlaylistEntry.class.getDeclaredFields())
@@ -99,6 +108,16 @@ class EntityMappingTest {
         assertNotNull(keyType.getDeclaredConstructor());
         assertNotNull(keyType.getDeclaredMethod("equals", Object.class));
         assertNotNull(keyType.getDeclaredMethod("hashCode"));
+    }
+
+    @Test
+    void playlistEntryPositionIsARequiredWrapperField() throws NoSuchFieldException {
+        var position = PlaylistEntry.class.getDeclaredField("position");
+
+        assertEquals(Integer.class, position.getType());
+        var column = position.getAnnotation(Column.class);
+        assertNotNull(column, "Position must be mapped as a column");
+        assertFalse(column.nullable(), "Playlist entry position is required");
     }
 
     private static boolean hasDeclaredId(Class<?> type) {
