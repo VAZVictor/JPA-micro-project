@@ -1,5 +1,8 @@
 package at.htl.workloads.audioItem;
 
+import at.htl.model.audioItem.UnusedAudioItemDTO;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,8 @@ public interface AudioItemRepository {
     Optional<Track> findTrackById(Long id);
 
     List<PodcastEpisode> findAllPodcastEpisodes();
+
+    List<UnusedAudioItemDTO> findUnused(LocalDateTime from, LocalDateTime to);
 
     boolean isReferenced(Long id);
 

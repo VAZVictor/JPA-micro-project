@@ -5,6 +5,7 @@ import at.htl.error.NotFoundException;
 import at.htl.model.playlist.AddEntryRequest;
 import at.htl.model.playlist.CreatePlaylistRequest;
 import at.htl.model.playlist.PlaylistDTO;
+import at.htl.model.playlist.PlaylistOverviewDTO;
 import at.htl.model.playlist.ReorderPlaylistRequest;
 import at.htl.model.playlist.UpdatePlaylistRequest;
 import at.htl.workloads.audioItem.AudioItem;
@@ -35,6 +36,20 @@ public class PlaylistServiceImpl implements PlaylistService {
         this.userRepository = userRepository;
         this.audioItemRepository = audioItemRepository;
         this.playlistMapper = playlistMapper;
+    }
+
+    @Override
+    public List<PlaylistOverviewDTO> getOverviews(Long userId) {
+        if (userId != null && userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("User " + userId + " does not exist");
+        }
+        return playlistRepository.getOverviews(userId);
+    }
+
+    @Override
+    public PlaylistOverviewDTO getOverview(Long id) {
+        return playlistRepository.getOverview(id)
+                .orElseThrow(() -> new NotFoundException("Playlist " + id + " does not exist"));
     }
 
     @Override
