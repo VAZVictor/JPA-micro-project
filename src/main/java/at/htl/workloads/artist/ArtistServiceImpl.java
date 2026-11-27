@@ -1,6 +1,8 @@
 package at.htl.workloads.artist;
 
+import at.htl.error.InvalidRequestException;
 import at.htl.model.artist.ArtistDTO;
+import at.htl.model.artist.ArtistListeningDTO;
 import at.htl.model.artist.CreateArtistRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -36,4 +38,17 @@ public class ArtistServiceImpl implements ArtistService {
                 .toList();
     }
 
+    @Override
+    public List<ArtistListeningDTO> getTopArtists(Long minSeconds, Integer page, Integer size) {
+        long threshold = minSeconds == null ? 0 : minSeconds;
+        int pageIndex = page == null ? 0 : page;
+        int pageSize = size == null ? 10 : size;
+        if (threshold < 0) {
+            throw new InvalidRequestException("minSeconds must not be negative");
+        }
+        if (pageIndex < 0 || pageSize < 1 || pageSize > 100) {
+            throw new InvalidRequestException("page must be >= 0 and size between 1 and 100");
+        }
+        return artistRepository.findTopArtists(threshold, pageIndex, pageSize);
+    }
 }

@@ -1,8 +1,10 @@
 package at.htl.workloads.audioItem;
 
+import at.htl.model.audioItem.UnusedAudioItemDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +65,28 @@ public class AudioItemRepositoryImpl implements AudioItemRepository {
                         """,
                         PodcastEpisode.class
                 ).getResultList();
+    }
+
+    @Override
+    public List<UnusedAudioItemDTO> findUnused(LocalDateTime from, LocalDateTime to) {
+        return entityManager.createQuery(
+                        """
+                        select new at.htl.model.audioItem.UnusedAudioItemDTO(
+                            a.id, a.title, ar.name, a.durationSeconds, count(pe.addedAt))
+                        from AudioItem a
+                        join a.artist ar
+                        left join ListeningSession s
+                            on s.audioItem = a and s.startedAt >= :from and s.startedAt < :to
+                        left join PlaylistEntry pe on pe.audioItem = a
+                        where s.id is null
+                        group by a.id, a.title, ar.name, a.durationSeconds
+                        order by ar.name, a.title
+                        """,
+                        UnusedAudioItemDTO.class
+                )
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
     }
 
     @Override

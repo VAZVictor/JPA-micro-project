@@ -8,6 +8,7 @@ import at.htl.model.audioItem.CreatePodcastEpisodeRequest;
 import at.htl.model.audioItem.CreateTrackRequest;
 import at.htl.model.audioItem.PodcastEpisodeDTO;
 import at.htl.model.audioItem.TrackDTO;
+import at.htl.model.audioItem.UnusedAudioItemDTO;
 import at.htl.model.audioItem.UpdateTrackRequest;
 import at.htl.workloads.album.AlbumRepository;
 import at.htl.workloads.artist.ArtistRepository;
@@ -16,6 +17,7 @@ import at.htl.workloads.genre.GenreRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +55,17 @@ public class AudioItemServiceImpl implements AudioItemService {
         return audioItemRepository.findById(id)
                 .map(audioItemMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Audio item " + id + " does not exist"));
+    }
+
+    @Override
+    public List<UnusedAudioItemDTO> getUnused(LocalDate from, LocalDate to) {
+        if (from == null || to == null) {
+            throw new InvalidRequestException("from and to are required");
+        }
+        if (from.isAfter(to)) {
+            throw new InvalidRequestException("from must not be after to");
+        }
+        return audioItemRepository.findUnused(from.atStartOfDay(), to.plusDays(1).atStartOfDay());
     }
 
     @Override
