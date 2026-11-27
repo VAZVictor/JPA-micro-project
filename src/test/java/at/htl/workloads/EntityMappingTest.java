@@ -7,6 +7,7 @@ import at.htl.workloads.audioItem.PodcastEpisode;
 import at.htl.workloads.audioItem.Track;
 import at.htl.workloads.device.Device;
 import at.htl.workloads.favorite.Favorite;
+import at.htl.workloads.genre.Genre;
 import at.htl.workloads.listeningSession.ListeningSession;
 import at.htl.workloads.playlist.Playlist;
 import at.htl.workloads.playlist.PlaylistEntry;
@@ -17,9 +18,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -29,29 +31,30 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EntityMappingTest {
 
     @Test
-    void persistentClassesAreEntitiesButGenreIsNot() {
+    void persistentClassesAreEntities() {
         var entityTypes = List.of(Album.class, Artist.class, AudioItem.class, Track.class,
-                PodcastEpisode.class, Device.class, Favorite.class, ListeningSession.class,
-                Playlist.class, PlaylistEntry.class, User.class);
+                PodcastEpisode.class, Device.class, Favorite.class, Genre.class,
+                ListeningSession.class, Playlist.class, PlaylistEntry.class, User.class);
 
         for (var entityType : entityTypes) {
             assertTrue(entityType.isAnnotationPresent(Entity.class),
                     () -> entityType.getSimpleName() + " must be an entity");
         }
-        assertFalse(Genre.class.isAnnotationPresent(Entity.class));
     }
 
     @Test
     void standaloneEntitiesAndInheritanceRootUseGeneratedLongIdentityIds()
             throws NoSuchFieldException, NoSuchMethodException {
         var idTypes = List.of(Album.class, Artist.class, AudioItem.class, Device.class,
-                Favorite.class, ListeningSession.class, Playlist.class, User.class);
+                Favorite.class, Genre.class, ListeningSession.class, Playlist.class, User.class);
 
         for (var idType : idTypes) {
             assertIdentityId(idType);
@@ -71,34 +74,41 @@ class EntityMappingTest {
     }
 
     @Test
+    void subclassesDoNotRedeclareTheInheritanceStrategy() {
+        assertNull(Track.class.getAnnotation(Inheritance.class));
+        assertNull(PodcastEpisode.class.getAnnotation(Inheritance.class));
+    }
+
+    @Test
     void playlistEntryHasACompositeKeyOfPlaylistIdAndPosition()
             throws NoSuchFieldException, NoSuchMethodException {
         var embeddedIdField = Arrays.stream(PlaylistEntry.class.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(EmbeddedId.class))
                 .findFirst();
 
-        Class<?> keyType;
-        if (embeddedIdField.isPresent()) {
-            keyType = embeddedIdField.get().getType();
-            assertTrue(keyType.isAnnotationPresent(Embeddable.class),
-                    "An embedded key class must be embeddable");
-        } else {
-            var idClass = PlaylistEntry.class.getAnnotation(IdClass.class);
-            assertNotNull(idClass, "Use either an embedded id or an id class for the composite key");
-            if (idClass == null) {
-                return;
-            }
-            keyType = idClass.value();
-            assertEntityIdField("playlistId", Long.class);
-            assertEntityIdField("position", Integer.class);
-        }
-
+        assertTrue(embeddedIdField.isPresent(), "PlaylistEntry needs an embedded id");
+        var keyType = embeddedIdField.get().getType();
+        assertTrue(keyType.isAnnotationPresent(Embeddable.class), "An embedded key class must be embeddable");
         assertEquals(Long.class, keyType.getDeclaredField("playlistId").getType());
         assertEquals(Integer.class, keyType.getDeclaredField("position").getType());
         assertTrue(Serializable.class.isAssignableFrom(keyType));
         assertNotNull(keyType.getDeclaredConstructor());
         assertNotNull(keyType.getDeclaredMethod("equals", Object.class));
         assertNotNull(keyType.getDeclaredMethod("hashCode"));
+    }
+
+    @Test
+    void playlistReferenceInEntryIsMappedOntoTheKey() throws NoSuchFieldException {
+        var mapsId = PlaylistEntry.class.getDeclaredField("playlist").getAnnotation(MapsId.class);
+        assertNotNull(mapsId, "PlaylistEntry.playlist needs @MapsId");
+        assertEquals("playlistId", mapsId.value());
+    }
+
+    @Test
+    void userTableAvoidsReservedWord() {
+        var table = User.class.getAnnotation(Table.class);
+        assertNotNull(table, "'user' is reserved in PostgreSQL - User needs an explicit @Table name");
+        assertNotEquals("user", table.name().toLowerCase());
     }
 
     private static boolean hasDeclaredId(Class<?> type) {
@@ -108,12 +118,6 @@ class EntityMappingTest {
         } catch (NoSuchFieldException ignored) {
             return false;
         }
-    }
-
-    private static void assertEntityIdField(String name, Class<?> expectedType) throws NoSuchFieldException {
-        Field field = PlaylistEntry.class.getDeclaredField(name);
-        assertEquals(expectedType, field.getType(), name + " type");
-        assertNotNull(field.getAnnotation(Id.class), name + " @Id");
     }
 
     private static void assertIdentityId(Class<?> type) throws NoSuchFieldException {

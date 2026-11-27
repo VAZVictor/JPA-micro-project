@@ -1,12 +1,15 @@
 package at.htl.workloads.playlist;
 
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.util.Objects;
 
-// TODO (you): add the annotation required by your chosen composite-key mapping
+@Embeddable
 public class PlaylistEntryId implements Serializable {
 
     private Long playlistId;
+
     private Integer position;
 
     public PlaylistEntryId() {
