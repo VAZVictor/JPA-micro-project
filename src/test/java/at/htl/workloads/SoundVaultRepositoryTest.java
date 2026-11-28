@@ -43,4 +43,10 @@ class SoundVaultRepositoryTest {
         assertTrue(overview.isPresent(), "Playlist-Übersicht für ID 1 muss vorhanden sein");
         assertEquals("Morgenroutine", overview.get().name());
     }
+    @Test
+    void shouldFindTopArtistsByListeningSeconds() {
+        var topArtists = artistRepository.findTopArtists(100L, 0, 10);
+        assertFalse(topArtists.isEmpty());
+        assertTrue(topArtists.get(0).totalSeconds() >= 100L);
+    }
 }

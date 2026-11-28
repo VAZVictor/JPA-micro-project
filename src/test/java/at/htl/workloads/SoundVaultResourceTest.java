@@ -66,4 +66,30 @@ class SoundVaultResourceTest {
                 .then()
                 .statusCode(400);
     }
+    @Test
+    void shouldReturnBadRequestWhenCreatingArtistWithEmptyName() {
+        String invalidBody = """
+        {
+          "name": "",
+          "country": "Austria"
+        }
+        """;
+
+        given()
+                .contentType("application/json")
+                .body(invalidBody)
+                .when()
+                .post("/api/artists")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenUnusedEndpointMissingParams() {
+        given()
+                .when()
+                .get("/api/audio-items/unused")
+                .then()
+                .statusCode(400); // Da from/to als Pflichtparameter definiert sind
+    }
 }
