@@ -47,6 +47,6 @@ class SoundVaultRepositoryTest {
     void shouldFindTopArtistsByListeningSeconds() {
         var topArtists = artistRepository.findTopArtists(100L, 0, 10);
         assertFalse(topArtists.isEmpty());
-        assertTrue(topArtists.get(0).totalSeconds() >= 100L);
+        assertTrue(topArtists.getFirst().totalSeconds() >= 100L);
     }
 }
