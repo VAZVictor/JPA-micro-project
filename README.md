@@ -197,8 +197,10 @@ no `@QuarkusTest`. Four checks:
 - `PlaylistEntry` uses `@EmbeddedId`/`@IdClass` with an embeddable, serializable key
   of `Long playlistId` + `Integer position` - **fails**, see [P3](#p3)
 
-No service, repository or REST tests exist. Testcontainers is required by issue #11 but
-not yet a dependency; REST Assured and Mockito are present and unused.
+The query tests (`UnusedAudioItemsQueryTest`, `TopArtistsQueryTest`,
+`PlaylistOverviewQueryTest`) are `@QuarkusTest`s and need PostgreSQL on `localhost:5432`
+with the seed data - see [Use cases and queries](#use-cases-and-queries). Testcontainers
+is required by issue #11 but not yet a dependency.
 
 Frontend: two starter smoke tests on `main`, six tests on `13-frontend-client`
 (heading, component composition, navigation, search filtering, and totals staying
@@ -218,20 +220,98 @@ Data is five hardcoded tracks and three playlists, filtered client-side. **No HT
 happen** - `provideHttpClient()` is registered but unused. The interfaces in
 `models/music.models.ts` are UI models, not backend DTOs.
 
-## Planned use cases and queries
+## Use cases and queries
 
-Not implemented. Binding specification in issues #10, #13, #14.
+Implemented in issue #10. All three queries live in the repositories, are called from the
+services and exposed through REST use cases (#14).
 
-The three mandatory complex queries:
+| Query | Repository method | Endpoint |
+| --- | --- | --- |
+| Unused audio items per time range | `AudioItemRepository.findUnused` | `GET /api/audio-items/unused?from=&to=` |
+| Most popular artists | `ArtistRepository.findTopArtists` | `GET /api/artists/top?minSeconds=&page=&size=` |
+| Playlist overview | `PlaylistRepository.getOverview(s)` | `GET /api/playlists`, `GET /api/playlists/{id}/overview` |
 
-1. **Unused audio items per time range** - LEFT OUTER JOIN of `AudioItem` against
-   `ListeningSession` and `PlaylistEntry`, filtered on `session.id IS NULL`. Must also
-   return items never played and never playlisted; the seed needs such a track.
-2. **Most popular artists** - `GROUP BY artist`, `SUM(listenedSeconds)`,
-   `HAVING SUM(...) > :threshold`, descending, paged. Edge cases: empty result, artist
-   exactly on the HAVING boundary.
-3. **Playlist / library overview** - DTO projection with computed fields (entry count,
-   total duration, last used) as a query object or constructor expression, not an entity graph.
+### 1. Unused audio items per time range
+
+```sql
+select new UnusedAudioItemDTO(a.id, a.title, ar.name, a.durationSeconds, count(pe.addedAt))
+from AudioItem a join a.artist ar
+left join ListeningSession s
+    on s.audioItem = a and s.startedAt >= :from and s.startedAt < :to
+left join PlaylistEntry pe on pe.audioItem = a
+where s.id is null
+group by a.id, a.title, ar.name, a.durationSeconds
+```
+
+- The range condition sits in the `ON` clause, not in `WHERE`. In `WHERE` it would turn
+  the outer join back into an inner join and drop every item that was never played.
+- `count(pe.addedAt)` counts only non-null rows, so an item without playlist entries
+  shows `0` instead of `1`.
+- `to` is inclusive for the user: the service turns `to` into `to + 1 day 00:00` and
+  queries half-open (`< :to`), so sessions late on the last day still count.
+- Queried on the root `AudioItem`, so tracks and podcast episodes appear together.
+
+### 2. Most popular artists
+
+```sql
+select new ArtistListeningDTO(ar.id, ar.name, sum(s.listenedSeconds), count(s.id))
+from ListeningSession s join s.audioItem a join a.artist ar
+group by ar.id, ar.name
+having sum(s.listenedSeconds) >= :minSeconds
+order by sum(s.listenedSeconds) desc, ar.name
+```
+
+- `minSeconds` is a lower bound: an artist exactly on the threshold is included.
+- Paging with `setFirstResult`/`setMaxResults`. The secondary sort on the name keeps the
+  order stable when totals are equal - otherwise pages could overlap.
+- Artists without any session never appear, because the query starts at
+  `ListeningSession` (inner join on purpose).
+- `page >= 0`, `1 <= size <= 100`, `minSeconds >= 0`, otherwise `400`.
+
+### 3. Playlist overview
+
+```sql
+select new PlaylistOverviewDTO(p.id, p.name, u.username, count(a.id),
+                               coalesce(sum(a.durationSeconds), 0L), max(e.addedAt))
+from Playlist p join p.user u
+left join p.entries e left join e.audioItem a
+group by p.id, p.name, u.username
+```
+
+- Outer joins keep empty playlists: `entryCount` and `totalDurationSeconds` are `0`,
+  `lastAddedAt` is `null`.
+- The same item twice in a playlist counts twice - an entry is a position, not an item.
+- One statement and one round trip, no entity graph and no lazy loading.
+
+### Query strategy and trade-offs
+
+- **Typed JPQL with constructor expressions** (`select new ...DTO(...)`). The compiler
+  checks the result type, the result is read-only and carries only the columns needed.
+  Trade-off: the DTO constructor must match the selected types exactly (`sum` of an
+  `Integer` returns `Long`); a mismatch only fails at runtime, which the tests cover.
+- **No named queries.** The queries are used once, in one repository. Inline text blocks
+  keep query and mapping in one place. Named queries would be validated at startup,
+  but would move the query away from the code that sets its parameters.
+- **No Criteria API.** Nothing is assembled dynamically except the optional user filter
+  of the overview, which is a simple string append. JPQL stays more readable.
+- **Aggregation in the database, not in Java.** Loading all sessions and summing in a
+  stream would load the whole table and break paging.
+- **Entity joins with `ON`** (`left join ListeningSession s on ...`) instead of new
+  `@OneToMany` collections on `AudioItem`: the model does not need these collections,
+  and nobody can load them by accident.
+
+### Tests
+
+One `@QuarkusTest` per query in `src/test/java/at/htl/workloads`, calling the services
+against the seed data. Changes run inside `@TestTransaction` and are rolled back.
+
+| Test class | Edge cases |
+| --- | --- |
+| `UnusedAudioItemsQueryTest` | never played and never playlisted (outer join, count `0`), session outside the range, whole last day included, range without sessions, no hits, invalid range |
+| `TopArtistsQueryTest` | exactly on the HAVING threshold, one second below, no hits, artist without sessions, paging past the end, ranking change after a new session, invalid parameters |
+| `PlaylistOverviewQueryTest` | empty playlist (`0`, `0`, `null`), same item twice, user filter, overview after adding an entry, unknown ids |
+
+### Use cases
 
 | Use case | Flow |
 | --- | --- |
@@ -241,19 +321,6 @@ The three mandatory complex queries:
 | "Top artists" | set threshold and page, ranked by aggregated listening time |
 
 Further: record a listening session (user, device, item, duration) and toggle a favorite.
-
-Draft endpoints:
-
-```text
-GET    /api/audio-items/unused?from=&to=
-GET    /api/artists/top?minSeconds=&page=&size=
-GET    /api/playlists/{id}/overview
-POST   /api/playlists                creates playlist plus entries in one use case
-PUT    /api/playlists/{id}/order     the update use case
-DELETE /api/playlists/{id}
-POST   /api/listening-sessions
-PUT    /api/tracks/{id}
-```
 
 Insert/update/delete is deliberately not offered for every entity - dependent entities
 are created through their aggregate use case, as the assignment allows.
@@ -269,7 +336,7 @@ Single source of truth for progress. Backlog: 14 open, 2 closed.
 | Master/detail relation | open | modelled, `@OneToMany` missing - #6 |
 | Composite key | partial | key class complete, annotations missing - #8, [P3](#p3) |
 | Inheritance relation | broken | hierarchy correct, annotation misplaced, test red - #8, [P2](#p2) |
-| Three complex queries | open | specified only - #10 |
+| Three complex queries | partial | implemented, tested, REST use cases; client still on demo data - #10, #13 |
 | Update use case on managed entity | open | #9 |
 | REST API for insert/update/delete | open | extension present, no resource - #14 |
 | JPA for loading and persisting | partial | Hibernate configured, no data access code - #9 |
